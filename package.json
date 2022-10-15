@@ -1,7 +1,7 @@
 {
-  "name": "nodep",
+  "name": "cuapan-backend",
   "version": "1.0.0",
-  "description": "TechNotes MERN Project",
+  "description": "Backend part of the Cuapan project",
   "main": "server.js",
   "scripts": {
     "start": "node server",

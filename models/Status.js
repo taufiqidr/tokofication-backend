@@ -8,17 +8,13 @@ const noteSchema = new mongoose.Schema(
             required: true,
             ref: 'User'
         },
-        title: {
-            type: String,
-            required: true
-        },
         text: {
             type: String,
             required: true
         },
-        completed: {
-            type: Boolean,
-            default: false
+        likes: {
+            type: Number,
+            default: 0
         }
     },
     {
@@ -32,4 +28,4 @@ noteSchema.plugin(AutoIncrement, {
     start_seq: 500
 })
 
-module.exports = mongoose.model('Note', noteSchema)
+module.exports = mongoose.model('Status', noteSchema)
