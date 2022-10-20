@@ -1,6 +1,6 @@
 {
   "name": "cuapan-backend",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Backend part of the Cuapan project",
   "main": "server.js",
   "scripts": {

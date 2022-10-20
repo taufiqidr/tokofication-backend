@@ -1,7 +1,10 @@
 const mongoose = require('mongoose')
-
 const userSchema = new mongoose.Schema({
     username: {
+        type: String,
+        required: true
+    },
+    email: {
         type: String,
         required: true
     },
@@ -9,13 +12,15 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    name: String,
+    profile_pic: {
+        type: String,
+        default: "default.jpg"
+    },
+    dob: Date,
     roles: {
         type: [String],
         default: ["Normal"]
-    },
-    active: {
-        type: Boolean,
-        default: true
     }
 })
 
