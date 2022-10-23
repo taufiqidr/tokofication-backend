@@ -1,6 +1,7 @@
 const User = require('../models/User')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const verifyJWT = require('../middleware/verifyJWT')
 
 // @desc Login
 // @route POST /auth
@@ -51,8 +52,11 @@ const login = async (req, res) => {
     res.json({ accessToken })
 }
 
+// @desc Register
+// @route POST /auth/register
+// @access Public
 const register = async (req, res) => {
-    const { username, email, password, name, profile_pic, roles } = req.body
+    const { username, email, password, name } = req.body
     const dob = new Date(req.body.dob)
     // Confirm data
     if (!username || !email || !password || dob === "Invalid Date") {
@@ -76,9 +80,7 @@ const register = async (req, res) => {
     // Hash password 
     const hashedPwd = await bcrypt.hash(password, 10) // salt rounds
 
-    const userObject = (!Array.isArray(roles) || !roles.length)
-        ? { username, email, password, name, dob, "password": hashedPwd }
-        : { username, email, password, name, dob, "password": hashedPwd, roles }
+    const userObject = { username, email, password, name, dob, "password": hashedPwd }
 
     // Create and store new user 
     const user = await User.create(userObject)

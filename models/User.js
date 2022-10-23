@@ -12,12 +12,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    name: String,
-    profile_pic: {
+    name: {
         type: String,
-        default: "default.jpg"
+        required: true
     },
-    dob: Date,
+    dob: {
+        type: Date,
+        required: true
+    },
     roles: {
         type: [String],
         default: ["Normal"]
