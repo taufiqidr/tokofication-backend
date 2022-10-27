@@ -50,10 +50,10 @@ const createNewStatus = async (req, res) => {
 // @route PATCH /statuses
 // @access Private
 const updateStatus = async (req, res) => {
-    const { id, user, text, likes } = req.body
+    const { id, user, text } = req.body
 
     // Confirm data
-    if (!id || !user || !text || typeof likes !== 'number') {
+    if (!id || !user || !text) {
         return res.status(400).json({ message: 'All fields are required' })
     }
 
@@ -66,7 +66,6 @@ const updateStatus = async (req, res) => {
 
     status.user = user
     status.text = text
-    status.likes = likes
 
     const updatedStatus = await status.save()
 

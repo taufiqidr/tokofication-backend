@@ -56,7 +56,7 @@ const login = async (req, res) => {
 // @route POST /auth/register
 // @access Public
 const register = async (req, res) => {
-    const { username, email, password, name } = req.body
+    const { name, username, description, email, password, } = req.body
     const dob = new Date(req.body.dob)
     // Confirm data
     if (!username || !email || !password || dob === "Invalid Date") {
@@ -80,7 +80,7 @@ const register = async (req, res) => {
     // Hash password 
     const hashedPwd = await bcrypt.hash(password, 10) // salt rounds
 
-    const userObject = { username, email, password, name, dob, "password": hashedPwd }
+    const userObject = { name, username, description, email, dob, "password": hashedPwd }
 
     // Create and store new user 
     const user = await User.create(userObject)

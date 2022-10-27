@@ -21,10 +21,10 @@ const getAllUsers = async (req, res) => {
 // @route POST /users
 // @access Private
 const createNewUser = async (req, res) => {
-    const { username, email, password, name, roles } = req.body
+    const { name, username, description, email, password, roles } = req.body
     const dob = new Date(req.body.dob)
     // Confirm data
-    if (!username || !email || !name || !password || dob === "Invalid Date") {
+    if (!username || !email || !password || dob === "Invalid Date") {
         return res.status(400).json({ message: 'All fields are required' })
     }
 
@@ -45,8 +45,8 @@ const createNewUser = async (req, res) => {
     const hashedPwd = await bcrypt.hash(password, 10) // salt rounds
 
     const userObject = (!Array.isArray(roles) || !roles.length)
-        ? { username, email, password, name, dob, "password": hashedPwd }
-        : { username, email, password, name, dob, "password": hashedPwd, roles }
+        ? { name, username, description, email, dob, "password": hashedPwd }
+        : { name, username, description, email, dob, "password": hashedPwd, roles }
 
     // Create and store new user 
     const user = await User.create(userObject)
@@ -62,12 +62,11 @@ const createNewUser = async (req, res) => {
 // @route PATCH /users
 // @access Private
 const updateUser = async (req, res) => {
-    const { id, username, email, password, name } = req.body
-    const dob = new Date(req.body.dob)
+    const { id, name, username, description, email, password, dob } = req.body
 
     // Confirm data 
-    if (!id || !username || !email || !name || dob === "Invalid Date") {
-        return res.status(400).json({ message: 'All fields are required' })
+    if (!id) {
+        return res.status(400).json({ message: 'ID field are required' })
     }
     // Does the user exist to update?
     const user = await User.findById(id).exec()
@@ -77,8 +76,13 @@ const updateUser = async (req, res) => {
     }
 
     // Check for duplicate 
-    const duplicate_username = await User.findOne({ username }).collation({ locale: 'en', strength: 2 }).lean().exec()
-    const duplicate_email = await User.findOne({ email }).collation({ locale: 'en', strength: 2 }).lean().exec()
+    let duplicate_username, duplicate_email
+    if (username) {
+        duplicate_username = await User.findOne({ username }).collation({ locale: 'en', strength: 2 }).lean().exec()
+    }
+    if (email) {
+        duplicate_email = await User.findOne({ email }).collation({ locale: 'en', strength: 2 }).lean().exec()
+    }
 
     // Allow updates to the original user 
     if (duplicate_username && duplicate_username?._id.toString() !== id) {
@@ -88,10 +92,11 @@ const updateUser = async (req, res) => {
         return res.status(409).json({ message: 'Duplicate email' })
     }
 
-    user.username = username
-    user.email = email
-    user.name = name
-    user.dob = dob
+    if (name) user.name = name
+    if (username) user.username = username
+    if (description) user.description = description
+    if (email) user.email = email
+    if (dob) user.dob = new Date(req.body.dob)
     if (password) {
         // Hash password 
         user.password = await bcrypt.hash(password, 10) // salt rounds 
@@ -138,3 +143,4 @@ module.exports = {
     updateUser,
     deleteUser
 }
+

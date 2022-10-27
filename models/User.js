@@ -1,9 +1,14 @@
 const mongoose = require('mongoose')
 const userSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
     username: {
         type: String,
         required: true
     },
+    description: String,
     email: {
         type: String,
         required: true
@@ -12,10 +17,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    name: {
-        type: String,
-        required: true
-    },
+
     dob: {
         type: Date,
         required: true
@@ -24,6 +26,11 @@ const userSchema = new mongoose.Schema({
         type: [String],
         default: ["Normal"]
     }
-})
+},
+    {
+        timestamps: true
+    })
 
 module.exports = mongoose.model('User', userSchema)
+
+// profile picture pakai url
