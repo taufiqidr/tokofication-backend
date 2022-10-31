@@ -14,7 +14,7 @@ html {
 body {
   min-height: 100vh;
   background-color: aquamarine;
-  color: whitesmoke;
+  color: blueviolet;
   display: grid;
   place-content: center;
   padding: 1rem;
