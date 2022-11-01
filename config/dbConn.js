@@ -1,10 +1,14 @@
-const mongoose = require('mongoose')
+const { Sequelize } = require('sequelize');
+const sequelize = new Sequelize('postgres://postgres:123@localhost:5432/tokofication')
+
 const connectDB = async () => {
     try {
-        await mongoose.connect(process.env.DATABASE_URI, { dbName: 'cuapan-prod' })
+        await sequelize.authenticate();
+        await sequelize.sync();
+        console.log('Connection has been established successfully.');
     } catch (err) {
         console.log(err)
     }
 }
 
-module.exports = connectDB
+module.exports = { connectDB, sequelize }

@@ -1,36 +1,31 @@
-const mongoose = require('mongoose')
-const userSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true
-    },
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/dbConn')
+
+const User = sequelize.define('User', {
+    // Model attributes are defined here
     username: {
-        type: String,
-        required: true
-    },
-    description: String,
-    email: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
     password: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
-    dob: {
-        type: Date,
-        required: true
+    balance: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    isMerchant: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     },
     roles: {
-        type: [String],
-        default: ["Normal"]
+        type: DataTypes.STRING,
+        defaultValue: "user"
     }
-},
-    {
-        timestamps: true
-    })
 
-module.exports = mongoose.model('User', userSchema)
+}, {
+    // Other model options go here
+});
 
-// profile picture pakai url
+module.exports = User

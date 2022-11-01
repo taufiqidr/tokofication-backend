@@ -1,19 +1,17 @@
 const User = require('../models/User')
-const Status = require('../models/Status')
 const bcrypt = require('bcrypt')
 
 // @desc Get all users
 // @route GET /users
 // @access Private
 const getAllUsers = async (req, res) => {
-    // Get all users from MongoDB
-    const users = await User.find().select('-password').lean()
-
+    const users = await User.findAll({
+        attributes: ['username', 'balance', 'isMerchant', 'roles']
+    });
     // If no users 
     if (!users?.length) {
         return res.status(400).json({ message: 'No users found' })
     }
-
     res.json(users)
 }
 
@@ -21,36 +19,27 @@ const getAllUsers = async (req, res) => {
 // @route POST /users
 // @access Private
 const createNewUser = async (req, res) => {
-    const { name, username, description, email, password, roles } = req.body
-    const dob = new Date(req.body.dob)
-    // Confirm data
-    if (!username || !email || !password || dob === "Invalid Date") {
+    const { username, password, balance } = req.body
+
+    if (!username || !password || !balance) {
         return res.status(400).json({ message: 'All fields are required' })
     }
 
-    const duplicate_username = await User.findOne({ username }).collation({ locale: 'en', strength: 2 }).lean().exec()
+    const duplicate_username = await User.findOne({ where: { username: username } })
 
     if (duplicate_username) {
         return res.status(409).json({ message: 'Duplicate username' })
     }
 
-    // Check for duplicate email
-    const duplicate_email = await User.findOne({ email }).collation({ locale: 'en', strength: 2 }).lean().exec()
-
-    if (duplicate_email) {
-        return res.status(409).json({ message: 'Duplicate email' })
-    }
-
-    // Hash password 
     const hashedPwd = await bcrypt.hash(password, 10) // salt rounds
 
-    const userObject = (!Array.isArray(roles) || !roles.length)
-        ? { name, username, description, email, dob, "password": hashedPwd }
-        : { name, username, description, email, dob, "password": hashedPwd, roles }
+    const UserObject = {
+        username,
+        "password": hashedPwd,
+        balance
+    }
 
-    // Create and store new user 
-    const user = await User.create(userObject)
-
+    const user = await User.create(UserObject);
     if (user) { //created 
         res.status(201).json({ message: `New user ${username} created` })
     } else {
@@ -62,41 +51,31 @@ const createNewUser = async (req, res) => {
 // @route PATCH /users
 // @access Private
 const updateUser = async (req, res) => {
-    const { id, name, username, description, email, password, dob } = req.body
+    const { id, username, password, balance } = req.body
 
     // Confirm data 
     if (!id) {
         return res.status(400).json({ message: 'ID field are required' })
     }
     // Does the user exist to update?
-    const user = await User.findById(id).exec()
+    const user = await User.findOne({ where: { id: id } })
 
     if (!user) {
         return res.status(400).json({ message: 'User not found' })
     }
 
     // Check for duplicate 
-    let duplicate_username, duplicate_email
+    let duplicate_username
     if (username) {
-        duplicate_username = await User.findOne({ username }).collation({ locale: 'en', strength: 2 }).lean().exec()
-    }
-    if (email) {
-        duplicate_email = await User.findOne({ email }).collation({ locale: 'en', strength: 2 }).lean().exec()
+        duplicate_username = await User.findOne({ where: { username: username } })
     }
 
     // Allow updates to the original user 
-    if (duplicate_username && duplicate_username?._id.toString() !== id) {
+    if (duplicate_username && duplicate_username?.id !== id) {
         return res.status(409).json({ message: 'Duplicate username' })
     }
-    if (duplicate_email && duplicate_email?._id.toString() !== id) {
-        return res.status(409).json({ message: 'Duplicate email' })
-    }
-
-    if (name) user.name = name
     if (username) user.username = username
-    if (description) user.description = description
-    if (email) user.email = email
-    if (dob) user.dob = new Date(req.body.dob)
+    if (balance) user.balance = balance
     if (password) {
         // Hash password 
         user.password = await bcrypt.hash(password, 10) // salt rounds 
@@ -117,24 +96,15 @@ const deleteUser = async (req, res) => {
         return res.status(400).json({ message: 'User ID Required' })
     }
 
-    // Does the user still have assigned statuses?
-    const status = await Status.findOne({ user: id }).lean().exec()
-    if (status) {
-        return res.status(400).json({ message: 'User still has statuses left' })
-    }
-
-    // Does the user exist to delete?
-    const user = await User.findById(id).exec()
+    const user = await User.findOne({ where: { id: id } })
 
     if (!user) {
         return res.status(400).json({ message: 'User not found' })
     }
 
-    const result = await user.deleteOne()
+    await user.destroy()
 
-    const reply = `Username ${result.username} with ID ${result._id} deleted`
-
-    res.json(reply)
+    res.json({ message: 'User deleted' })
 }
 
 module.exports = {
@@ -143,4 +113,3 @@ module.exports = {
     updateUser,
     deleteUser
 }
-

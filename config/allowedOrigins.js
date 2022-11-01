@@ -1,6 +1,6 @@
 const allowedOrigins = [
     'http://localhost:3000',
-    'https://cuapan.github.io'
+    'https://tokofication.github.io'
 ]
 
 module.exports = allowedOrigins

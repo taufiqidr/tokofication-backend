@@ -1,0 +1,51 @@
+- nav bar selalu ada dan ada field search
+- menu detail akun di navbar, jika tidak login ada register dan login button
+- 
+- ada manage toko jika user ada penjual, jika tidak hanya manage user
+
+Model:
+user:
+    wajib:
+    - username
+    - password
+    - saldo
+    - isMerchant
+    - roles (admin/normal)
+    
+    menyusul:
+    - nama
+    - dob
+    - gender
+    - email
+    - gambar
+    - alamat
+    - keranjang
+        - id barang (ref)
+    - riwayat pembelian
+        - id barang (ref)
+        - date
+    - wishlist(favorite)
+
+produk:
+    wajib:
+    - nama
+    - stok
+    - terjual
+    - harga
+
+    menyusul:
+    - seller (ref)
+    - kategori (ref)
+    - gambar
+
+kategori:
+    wajib:
+    - nama
+    menyusul:
+    - sub kategori
+
+frontend: React, Material UI
+backend: Node/Express JS, Sequelize
+build: Next JS
+DB: postgresSQL
+
