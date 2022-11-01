@@ -9,7 +9,6 @@ const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const corsOptions = require('./config/corsOptions')
 const { connectDB } = require('./config/dbConn')
-// const mongoose = require('mongoose')
 const PORT = process.env.PORT || 3500
 
 console.log(process.env.NODE_ENV)
@@ -28,7 +27,7 @@ app.use('/', express.static(path.join(__dirname, 'public')))
 
 app.use('/', require('./routes/root'))
 
-// app.use('/auth', require('./routes/authRoutes'))
+app.use('/auth', require('./routes/authRoutes'))
 app.use('/users', require('./routes/userRoutes'))
 app.use('/categories', require('./routes/categoryRoutes'))
 app.use('/products', require('./routes/productRoutes'))

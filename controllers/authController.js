@@ -13,15 +13,15 @@ const login = async (req, res) => {
         return res.status(400).json({ message: 'All fields are required' })
     }
 
-    const foundUser = await User.findOne({ username }).exec()
+    const foundUser = await User.findOne({ username })
 
     if (!foundUser) {
-        return res.status(401).json({ message: 'Unauthorized' })
+        return res.status(401).json({ message: 'Wrong username or password' })
     }
 
     const match = await bcrypt.compare(password, foundUser.password)
 
-    if (!match) return res.status(401).json({ message: 'Unauthorized' })
+    if (!match) return res.status(401).json({ message: 'Wrong username or password' })
 
     const accessToken = jwt.sign(
         {
@@ -56,35 +56,27 @@ const login = async (req, res) => {
 // @route POST /auth/register
 // @access Public
 const register = async (req, res) => {
-    const { name, username, description, email, password, } = req.body
-    const dob = new Date(req.body.dob)
+    const { username, password } = req.body
     // Confirm data
-    if (!username || !email || !password || dob === "Invalid Date") {
+    if (!username || !password) {
         return res.status(400).json({ message: 'All fields are required' })
     }
 
     // Check for duplicate username
-    const duplicate_username = await User.findOne({ username }).collation({ locale: 'en', strength: 2 }).lean().exec()
+    const duplicate_username = await User.findOne({ where: { username: username } })
 
     if (duplicate_username) {
         return res.status(409).json({ message: 'Duplicate username' })
     }
 
-    // Check for duplicate email
-    const duplicate_email = await User.findOne({ email }).collation({ locale: 'en', strength: 2 }).lean().exec()
-
-    if (duplicate_email) {
-        return res.status(409).json({ message: 'Duplicate email' })
-    }
-
-    // Hash password 
     const hashedPwd = await bcrypt.hash(password, 10) // salt rounds
 
-    const userObject = { name, username, description, email, dob, "password": hashedPwd }
+    const UserObject = {
+        username,
+        "password": hashedPwd,
+    }
 
-    // Create and store new user 
-    const user = await User.create(userObject)
-
+    const user = await User.create(UserObject);
     if (user) { //created 
         res.status(201).json({ message: `New user ${username} created` })
     } else {

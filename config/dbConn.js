@@ -1,10 +1,10 @@
 const { Sequelize } = require('sequelize');
-const sequelize = new Sequelize('postgres://postgres:123@localhost:5432/tokofication')
+const sequelize = new Sequelize(process.env.DATABASE_URI)
 
 const connectDB = async () => {
     try {
         await sequelize.authenticate();
-        await sequelize.sync();
+        await sequelize.sync({ alter: true });
         console.log('Connection has been established successfully.');
     } catch (err) {
         console.log(err)
